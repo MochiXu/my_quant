@@ -7,6 +7,8 @@ numpy>=1.24
 pyarrow>=12
 akshare>=1.12
 python-dotenv>=1.0
+matplotlib>=3.8
+seaborn>=0.13
 
 # dev
 pytest>=7.0

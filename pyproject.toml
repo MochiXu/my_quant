@@ -9,6 +9,8 @@ dependencies = [
     "pyarrow>=12",
     "akshare>=1.12",
     "python-dotenv>=1.0",
+    "matplotlib>=3.8",
+    "seaborn>=0.13",
 ]
 
 [project.optional-dependencies]
@@ -16,6 +18,7 @@ dev = ["pytest>=7.0", "pytest-mock>=3.10"]
 
 [project.scripts]
 my-quant-sync = "scripts.sync_data:main"
+my-quant-backtest = "scripts.run_backtest:main"
 
 [build-system]
 requires = ["setuptools>=68.0"]
@@ -27,6 +30,9 @@ packages = [
     "my_quant.core",
     "my_quant.data",
     "my_quant.data.providers",
+    "my_quant.strategies",
+    "my_quant.backtest",
+    "my_quant.reporting",
     "config",
     "scripts",
 ]

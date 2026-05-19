@@ -38,6 +38,7 @@ class Paths:
     raw_dir: Path        # 行情 / 特征库 parquet 根目录
     live_dir: Path       # 实盘台账与下单计划（P3）
     meta_dir: Path       # 元数据缓存，如交易日历
+    reports_dir: Path    # 回测报告与图表输出
 
     @classmethod
     def default(cls) -> "Paths":
@@ -50,6 +51,7 @@ class Paths:
             raw_dir=data / "raw",
             live_dir=data / "live",
             meta_dir=data / "raw" / "_meta",
+            reports_dir=data / "reports",
         )
 
 

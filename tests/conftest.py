@@ -57,5 +57,6 @@ def tmp_settings(tmp_path) -> Settings:
         raw_dir=data / "raw",
         live_dir=data / "live",
         meta_dir=data / "raw" / "_meta",
+        reports_dir=data / "reports",
     )
     return Settings(paths=paths, history_start="2024-01-02")
