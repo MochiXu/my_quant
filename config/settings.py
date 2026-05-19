@@ -30,6 +30,17 @@ class CostModel:
 
 
 @dataclass(frozen=True)
+class LiveConfig:
+    """实盘下单计划相关配置（P3）。"""
+
+    lot_size: int = 100               # ETF 每手份数
+    no_trade_band: float = 0.05       # 目标与现状权重偏离小于此值则不调仓，避免微调churn
+    tick_size: float = 0.001          # ETF 最小价位
+    limit_buffer_ticks: int = 5       # 限价相对参考价的缓冲档数（买高卖低）
+    tranche_cap: float = 200_000.0    # 单笔预估金额超过此值则建议拆单
+
+
+@dataclass(frozen=True)
 class Paths:
     """项目内所有目录路径。由 default() 从本文件位置推算，禁止硬编码。"""
 
@@ -61,6 +72,7 @@ class Settings:
 
     initial_capital: float = 50_000.0                       # 初始资金（design.md 第 12 节）
     cost: CostModel = field(default_factory=CostModel)
+    live: LiveConfig = field(default_factory=LiveConfig)
     paths: Paths = field(default_factory=Paths.default)
 
     # 数据层

@@ -28,17 +28,24 @@ def offline_backtest(monkeypatch, tmp_settings):
 def test_run_backtest_dual_ma(offline_backtest, tmp_settings):
     rc = offline_backtest.main(["--symbols", "A", "--fast", "10", "--slow", "30"])
     assert rc == 0
-    chart = tmp_settings.paths.reports_dir / "backtest_dual_ma_A.png"
+    chart = tmp_settings.paths.reports_dir / "backtest_vector_dual_ma_A.png"
     assert chart.exists()
 
 
 def test_run_backtest_buy_and_hold(offline_backtest, tmp_settings):
     rc = offline_backtest.main(["--symbols", "A", "--strategy", "buy_and_hold"])
     assert rc == 0
-    assert (tmp_settings.paths.reports_dir / "backtest_buy_and_hold_A.png").exists()
+    assert (tmp_settings.paths.reports_dir / "backtest_vector_buy_and_hold_A.png").exists()
 
 
 def test_run_backtest_walk_forward(offline_backtest):
     rc = offline_backtest.main(["--symbols", "A", "--walk-forward",
                                 "--train-years", "2", "--test-years", "1"])
     assert rc == 0
+
+
+def test_run_backtest_backtrader_engine(offline_backtest, tmp_settings):
+    rc = offline_backtest.main(["--symbols", "A", "--engine", "backtrader",
+                                "--fast", "10", "--slow", "30"])
+    assert rc == 0
+    assert (tmp_settings.paths.reports_dir / "backtest_backtrader_dual_ma_A.png").exists()

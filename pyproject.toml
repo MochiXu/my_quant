@@ -19,6 +19,8 @@ dev = ["pytest>=7.0", "pytest-mock>=3.10"]
 [project.scripts]
 my-quant-sync = "scripts.sync_data:main"
 my-quant-backtest = "scripts.run_backtest:main"
+my-quant-live = "scripts.run_live:main"
+my-quant-record = "scripts.record_trade:main"
 
 [build-system]
 requires = ["setuptools>=68.0"]
@@ -33,6 +35,8 @@ packages = [
     "my_quant.strategies",
     "my_quant.backtest",
     "my_quant.reporting",
+    "my_quant.live",
+    "my_quant.live.broker",
     "config",
     "scripts",
 ]

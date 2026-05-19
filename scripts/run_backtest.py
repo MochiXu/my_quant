@@ -11,9 +11,11 @@ import argparse
 import sys
 
 from config.settings import SETTINGS
+from my_quant.backtest.bt_engine import run_bt_backtest
 from my_quant.backtest.vector import run_backtest
 from my_quant.backtest.walk_forward import walk_forward
 from my_quant.core.panel import Panel
+from my_quant.core.strategy import Strategy
 from my_quant.data.registry import ProviderRegistry
 from my_quant.reporting.plot import plot_backtest
 from my_quant.reporting.report import backtest_report, walk_forward_report
@@ -30,6 +32,8 @@ def build_parser() -> argparse.ArgumentParser:
     p.add_argument("--symbols", nargs="+", default=["510300"], metavar="CODE",
                    help="标的代码，默认 510300")
     p.add_argument("--strategy", choices=["dual_ma", "buy_and_hold"], default="dual_ma")
+    p.add_argument("--engine", choices=["vector", "backtrader"], default="vector",
+                   help="回测引擎：vector 向量化（快）/ backtrader 精细撮合")
     p.add_argument("--fast", type=int, default=20, help="双均线快线周期")
     p.add_argument("--slow", type=int, default=60, help="双均线慢线周期")
     p.add_argument("--adjust", choices=["raw", "qfq", "hfq"], default=None,
@@ -46,6 +50,13 @@ def build_parser() -> argparse.ArgumentParser:
 def _load_panel(symbols: list[str], adjust: str | None) -> Panel:
     provider = ProviderRegistry(SETTINGS).get("ohlcv")
     return Panel(provider.load(symbols, adjust=adjust))
+
+
+def _run(strategy: Strategy, panel: Panel, engine: str, start, end):
+    """按引擎名分派回测。"""
+    if engine == "backtrader":
+        return run_bt_backtest(strategy, panel, start=start, end=end)
+    return run_backtest(strategy, panel, start=start, end=end)
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -70,16 +81,17 @@ def main(argv: list[str] | None = None) -> int:
     else:
         strategy = BuyAndHold(args.symbols)
 
-    result = run_backtest(strategy, panel, start=args.start, end=args.end)
+    result = _run(strategy, panel, args.engine, args.start, args.end)
     benchmark = None
     if args.strategy != "buy_and_hold":
-        benchmark = run_backtest(BuyAndHold(args.symbols), panel,
-                                 start=args.start, end=args.end)
+        benchmark = _run(BuyAndHold(args.symbols), panel, args.engine,
+                         args.start, args.end)
 
-    title = f"{strategy.name} 回测 [{label}]"
+    title = f"{strategy.name} 回测 [{label}] · {args.engine} 引擎"
     print(backtest_report(result, benchmark, title=title))
 
-    out_path = SETTINGS.paths.reports_dir / f"backtest_{strategy.name}_{'_'.join(args.symbols)}.png"
+    out_path = (SETTINGS.paths.reports_dir
+                / f"backtest_{args.engine}_{strategy.name}_{'_'.join(args.symbols)}.png")
     plot_backtest(result, benchmark, output_path=out_path, title=title)
     print(f"\n图表已保存：{out_path}")
     return 0

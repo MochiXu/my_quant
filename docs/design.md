@@ -269,17 +269,27 @@ def required_data(self):
 
 ## 8. 回测引擎
 
-| | 向量化引擎 | backtrader 引擎 |
+| | 向量化引擎（`backtest/vector.py`） | backtrader 引擎（`backtest/bt_engine.py`） |
 |---|---|---|
 | 用途 | 快速扫参、walk-forward | 上线前精细撮合验证 |
-| 撮合 | 按收盘价、简化滑点 | 逐笔、佣金方案、可 cheat-on-open |
+| 撮合 | 收盘价、连续权重、简化成本 | 次日开盘成交、整手取整、最低佣金 |
 | 速度 | 快（适合上千次回测） | 慢（适合验证 1~2 个候选） |
-| 共享 | 同一个信号核 | 同一个信号核（precompute 权重后 `order_target_percent`） |
+| 共享 | 同一个信号核 `compute_weights` | 同一个信号核（预算权重后喂给 backtrader） |
 
-两引擎结果应当接近，差异只来自撮合精度——可作为交叉验证，结果差太多说明有 bug。
+两引擎共用同一份 `compute_weights` 输出，策略行为不会因引擎漂移。两者的差异是
+**有意为之的真实性差距**，不是 bug：
 
-绩效指标（`metrics.py`）：年化收益、夏普、最大回撤、卡玛、换手率、相对买入持有的超额。
-quant_learn 的 `sharpe_ratio` 等可移植。
+- 向量化引擎在连续权重空间工作，是理想化基准（决策即时按收盘价成交）。
+- backtrader 引擎按 `cheat_on_open` 在**次日开盘**成交、**整手取整**（100 份/手）、
+  收**最低 5 元佣金**——更贴近 5 万账户的真实摩擦。
+- 实测：高价 ETF（每手上万元）在 5 万账户里会因整手取整闲置可观现金，backtrader
+  收益明显低于向量化——这正是 design.md 第 12 节标注的颗粒度问题，由 backtrader
+  如实暴露。低价标的、恒定权重时两引擎高度一致，可作交叉校验。
+
+实现要点（backtrader）：`Cerebro(cheat_on_open=True)` + 策略逻辑写在 `next_open()`；
+用 `order_target_size` 落地整手目标股数；自定义 `CommInfoBase` 子类实现最低佣金下限。
+
+绩效指标（`metrics.py`）：总收益、年化、年化波动、夏普、最大回撤、卡玛、胜率。
 
 ## 9. 成本模型（`config/settings.py` 统一配置）
 
