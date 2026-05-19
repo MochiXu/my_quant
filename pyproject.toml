@@ -1,0 +1,37 @@
+[project]
+name = "my_quant"
+version = "0.1.0"
+description = "个人量化交易框架：热门 ETF 策略回测与半自动实盘"
+requires-python = ">=3.10"
+dependencies = [
+    "pandas>=2.0",
+    "numpy>=1.24",
+    "pyarrow>=12",
+    "akshare>=1.12",
+    "python-dotenv>=1.0",
+]
+
+[project.optional-dependencies]
+dev = ["pytest>=7.0", "pytest-mock>=3.10"]
+
+[project.scripts]
+my-quant-sync = "scripts.sync_data:main"
+
+[build-system]
+requires = ["setuptools>=68.0"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools]
+packages = [
+    "my_quant",
+    "my_quant.core",
+    "my_quant.data",
+    "my_quant.data.providers",
+    "config",
+    "scripts",
+]
+
+[tool.pytest.ini_options]
+markers = ["network: 需要联网的用例（默认不跑）"]
+addopts = "-m 'not network'"
+testpaths = ["tests"]

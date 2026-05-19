@@ -1,0 +1,13 @@
+# 由 conda env myTools 管理：conda activate myTools
+# 标准安装方式是 `pip install -e .`（依赖在 pyproject.toml 中声明）。
+# 本文件仅作依赖清单备查。
+
+pandas>=2.0
+numpy>=1.24
+pyarrow>=12
+akshare>=1.12
+python-dotenv>=1.0
+
+# dev
+pytest>=7.0
+pytest-mock>=3.10
