@@ -22,5 +22,4 @@ dist/
 .DS_Store
 
 # 数据（下载的 parquet、台账、报告）
-data/
 !data/.gitkeep
